@@ -4,7 +4,7 @@ CategorizeInteractiondData <- function(N) {
   Z2 <- rnorm(N)
   X <- numeric(N)
   Y <- numeric(N)
-
+  
   for (i in 1:N) {
     if (Z1[i] < 0 && Z2[i] < 0) {
       X[i] <- 0
@@ -15,7 +15,7 @@ CategorizeInteractiondData <- function(N) {
     } else {
       X[i] <- 3
     }
-
+    
     if (Z1[i] + Z2[i] < -1) {
       Y[i] <- 0
     } else if (Z1[i] + Z2[i] < 0) {
@@ -26,9 +26,9 @@ CategorizeInteractiondData <- function(N) {
       Y[i] <- 3
     }
   }
-
+  
   data_frame <- data.frame(Z1, Z2, X, Y)
-
+  
   return(data_frame)
 }
 
@@ -37,19 +37,19 @@ simulateExpLogData <- function(N) {
   Z2 <- rnorm(N)
   X <- numeric(N)
   Y <- numeric(N)
-
+  
   for (i in 1:N) {
     # Exponential impact on X
     X[i] <- ifelse(exp(Z1[i]) + Z2[i] > 1.5, 3,
                    ifelse(exp(Z1[i]) + Z2[i] > 0.5, 2,
                           ifelse(exp(Z1[i]) > 0, 1, 0)))
-
+    
     # Logarithmic impact on Y
     Y[i] <- ifelse(log(abs(Z1[i]) + 1) + Z2[i] > 0.5, 3,
                    ifelse(log(abs(Z1[i]) + 1) + Z2[i] > 0, 2,
                           ifelse(log(abs(Z1[i]) + 1) > -0.5, 1, 0)))
   }
-
+  
   return(data.frame(Z1, Z2, X, Y))
 }
 
@@ -58,17 +58,17 @@ simulateTrigData <- function(N) {
   Z2 <- rnorm(N)
   X <- numeric(N)
   Y <- numeric(N)
-
+  
   for (i in 1:N) {
     X[i] <- ifelse(sin(Z1[i]) + cos(Z2[i]) > 1, 3,
                    ifelse(sin(Z1[i]) + cos(Z2[i]) > 0, 2,
                           ifelse(sin(Z1[i]) > -1, 1, 0)))
-
+    
     Y[i] <- ifelse(cos(Z1[i]) - sin(Z2[i]) > 1, 3,
                    ifelse(cos(Z1[i]) - sin(Z2[i]) > 0, 2,
                           ifelse(cos(Z1[i]) > -1, 1, 0)))
   }
-
+  
   return(data.frame(Z1, Z2, X, Y))
 }
 
@@ -77,17 +77,17 @@ simulatePolyData <- function(N) {
   Z2 <- rnorm(N)
   X <- numeric(N)
   Y <- numeric(N)
-
+  
   for (i in 1:N) {
     X[i] <- ifelse(Z1[i]^2 + Z2[i]^2 > 2, 3,
                    ifelse(Z1[i]^2 + Z2[i] > 0.5, 2,
                           ifelse(Z1[i] + Z2[i]^2 > 0, 1, 0)))
-
+    
     Y[i] <- ifelse(Z1[i]^3 + Z2[i] > 1, 3,
                    ifelse(Z1[i]^2 - Z2[i]^2 > 0, 2,
                           ifelse(Z1[i] - Z2[i]^3 > -1, 1, 0)))
   }
-
+  
   return(data.frame(Z1, Z2, X, Y))
 }
 
@@ -96,10 +96,10 @@ simulateNonLinearData <- function(N) {
   Z2 <- runif(N, -1, 1)
   X <- numeric(N)
   Y <- numeric(N)
-
-
+  
+  
   for (i in 1:N) {
-
+    
     if (sin(Z1[i] * pi) + Z2[i] > 1) {
       X[i] <- 3
     } else if (sin(Z1[i] * pi) + Z2[i] > 0.5) {
@@ -109,8 +109,8 @@ simulateNonLinearData <- function(N) {
     } else {
       X[i] <- 0
     }
-
-
+    
+    
     if (cos(Z1[i] * pi) + Z2[i] > 1) {
       Y[i] <- 3
     } else if (cos(Z1[i] * pi) + Z2[i] > 0.5) {
@@ -121,7 +121,7 @@ simulateNonLinearData <- function(N) {
       Y[i] <- 0
     }
   }
-
+  
   return(data.frame(Z1, Z2, X, Y))
 }
 
@@ -130,7 +130,7 @@ simulateComplexCategorization <- function(N) {
   Z2 <- rnorm(N)
   X <- numeric(N)
   Y <- numeric(N)
-
+  
   for (i in 1:N) {
     X[i] <- ifelse(Z1[i] > 0 && Z2[i] > 0, 3,
                    ifelse(Z1[i] > 0 && Z2[i] <= 0, 2,
@@ -139,34 +139,33 @@ simulateComplexCategorization <- function(N) {
                    ifelse(Z1[i] + Z2[i] > 0, 2,
                           ifelse(Z1[i] + Z2[i] > -1, 1, 0)))
   }
-
+  
   return(data.frame(Z1, Z2, X, Y))
 }
 
 multinominal <- function(N, zeta = 1.5) {
   Z1 <- rnorm(N)
-
+  
   Z2 <- rnorm(N)
-
+  
   xb1 <- Z2 + zeta*Z1*Z2 + zeta*Z1
-
+  
   xb2 <- Z2 - zeta*Z1
-
+  
   xp1 <- 1/(1+exp(xb1) + exp(xb2))
   xp2 <- exp(xb1) /(1+exp(xb1) + exp(xb2))
   random <- runif(N,0, 1)
   X <- ifelse(random < xp1, "C", ifelse(random < xp1 + xp2,"A","B"))
-
+  
   yb1 = zeta*Z1*Z2
   yb2 <- exp(Z2) +  zeta*Z1
-
+  
   yp1 <- 1/(1+exp(yb1) + exp(yb2))
   yp2 <- exp(yb1) /(1+exp(yb1) + exp(yb2))
   random <- runif(N,0, 1)
   Y <- ifelse(random < yp1, "X", ifelse(random < yp1 + yp2,"Y","Z"))
-
+  
   df <- data.frame(Z1,Z2,X,Y)
-
+  
   return(df)
 }
-
